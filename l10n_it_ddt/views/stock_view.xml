@@ -8,26 +8,25 @@
             <field name="arch" type="xml">
                 <form string="DdT">
                     <header>
-                        <button name="updateLines" string="Update Lines" type="object"/>
+                        <button name="updateLines" string="Update Lines" type="object" states="draft"
+                            confirm="Update Lines will remove all the manually created lines. Do you want continue?"/>
                         <button name="ddt_confirm" states="draft" string="Confirm" class="oe_highlight"/>
+                        <button name="ddt_draft_cancel" states="draft" string="Cancel"/>
+                        <button name="ddt_confirmed_cancel" states="confirmed" string="Cancel"/>
                         <field name="state" widget="statusbar" nolabel="1" statusbar_visible="draft,confirmed,cancelled"/>
                     </header>
                     <sheet>
                         <group>
                             <group>
-                                <div class="oe_edit_only">
-                                    <label for="name"/>
-                                </div>
                                 <h1>
+                                    <label for="name" class="oe_inline"/>
                                     <field name="name" class="oe_inline" readonly="1"/>
                                 </h1>
-                            </group>
-                            <group>
-                                <label string="(*) Update Lines will remove all the manually created lines." style="font-style: italic;"/>
                             </group>
                         </group>
                         <group>
                             <group>
+                                <field name="date"/>
                                 <field name="delivery_date"/>
                                 <field name="sequence"/>
                                 <field name="partner_id"/>
@@ -39,15 +38,15 @@
                                     <tree string="DDT Lines" editable="top">
                                         <field name="sequence" widget="handle"/>
                                         <field name="name"/>
-                                        <field name="product"/>
-                                        <field name="product_uom"/>
+                                        <field name="product_id"/>
+                                        <field name="product_uom_id"/>
                                         <field name="quantity"/>
                                     </tree>
                                 </field>
                             </page>
                             <page string="Pickings">
-                                <field name="pickings"
-                                    domain="[('ddt_type', '=', 'outgoing')]"/>
+                                <field name="picking_ids"
+                                    domain="[('ddt_type', '=', 'outgoing'), ('partner_id', '=', partner_id)]"/>
                             </page>
                             <page string="Shipping Informations">
                                 <group>
@@ -60,6 +59,7 @@
                                             widget="selection"/>
                                         <field name="transportation_method_id"
                                             widget="selection"/>
+                                        <field name="parcels" />
                                     </group>
                                 </group>
                             </page>
@@ -76,6 +76,7 @@
                 <tree string="DdT">
                     <field name="name"/>
                     <field name="date"/>
+                    <field name="delivery_date"/>
                     <field name="partner_id"/>
                     <field name="state"/>
                 </tree>
@@ -95,7 +96,6 @@
             id="menu_action_stock_ddt"
             parent="stock.menu_stock_warehouse_mgmt"/>
 
-
         <record id="stock_picking_form_ddt" model="ir.ui.view">
             <field name="name">stock.picking.form.ddt</field>
             <field name="model">stock.picking</field>
@@ -111,6 +111,7 @@
                             widget="selection"/>
                         <field name="transportation_method_id"
                             widget="selection"/>
+                        <field name="parcels" />
                     </group>
                 </xpath>
             </field>
@@ -156,7 +157,7 @@
                 </form>
             </field>
         </record>
-        
+
         <record id="action_carriage_condition_tree" model="ir.actions.act_window">
             <field name="name">Carriage Conditions</field>
             <field name="res_model">stock.picking.carriage_condition</field>
@@ -164,7 +165,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-        
+
         <menuitem action="action_carriage_condition_tree" id="menu_action_carriage_condition_tree" parent="menu_stock_ddt_data"/>
 
         <record id="view_goods_description_tree" model="ir.ui.view">
@@ -190,7 +191,7 @@
                 </form>
             </field>
         </record>
-        
+
         <record id="action_goods_description_tree" model="ir.actions.act_window">
             <field name="name">Descriptions of Goods</field>
             <field name="res_model">stock.picking.goods_description</field>
@@ -198,7 +199,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-        
+
         <menuitem action="action_goods_description_tree" id="menu_action_good_description_tree" parent="menu_stock_ddt_data"/>
 
         <record id="view_transportation_reason_tree" model="ir.ui.view">
@@ -224,7 +225,7 @@
                 </form>
             </field>
         </record>
-        
+
         <record id="action_transportation_reason_tree" model="ir.actions.act_window">
             <field name="name">Reasons for Transportation</field>
             <field name="res_model">stock.picking.transportation_reason</field>
@@ -232,7 +233,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-        
+
         <menuitem action="action_transportation_reason_tree"
             id="menu_action_transportation_reason_tree" parent="menu_stock_ddt_data"/>
 
@@ -259,7 +260,7 @@
                 </form>
             </field>
         </record>
-        
+
         <record id="action_transportation_method_tree" model="ir.actions.act_window">
             <field name="name">Methods of Transportation</field>
             <field name="res_model">stock.picking.transportation_method</field>
@@ -267,7 +268,7 @@
             <field name="view_type">form</field>
             <field name="view_mode">tree,form</field>
         </record>
-        
+
         <menuitem action="action_transportation_method_tree"
             id="menu_action_transportation_method_tree" parent="menu_stock_ddt_data"/>
 

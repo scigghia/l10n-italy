@@ -19,26 +19,49 @@
 #
 ##############################################################################
 
+
 from openerp import api, models, fields, _
 from openerp.exceptions import Warning
 
 
-class StockDdTLine(models.Model):
-    _name = 'stock.ddt.line'
-    _description = 'DdT Line'
+class StockPickingCarriageCondition(models.Model):
 
-    sequence = fields.Integer(string='Sequence')
-    name = fields.Char(string='Name')
-    ddt_id = fields.Many2one('stock.ddt', string='DdT')
-    picking = fields.Many2one('stock.picking', string='Picking')
-    product = fields.Many2one('product.product', string='Product')
-    quantity = fields.Float(string='Quantity')
-    product_uom = fields.Many2one('product.uom', string='UoM')
+    _name = "stock.picking.carriage_condition"
+    _description = "Carriage Condition"
 
-    _order = 'sequence asc, id'
+    name = fields.Char(string='Carriage Condition', required=True)
+    note = fields.Text(string='Note')
+
+
+class StockPickingGoodsDescription(models.Model):
+
+    _name = 'stock.picking.goods_description'
+    _description = "Description of Goods"
+
+    name = fields.Char(string='Description of Goods', required=True)
+    note = fields.Text(string='Note')
+
+
+class StockPickingTransportationReason(models.Model):
+
+    _name = 'stock.picking.transportation_reason'
+    _description = 'Reason for Transportation'
+
+    name = fields.Char(string='Reason For Transportation', required=True)
+    note = fields.Text(string='Note')
+
+
+class StockPickingTransportationMethod(models.Model):
+
+    _name = 'stock.picking.transportation_method'
+    _description = 'Method of Transportation'
+
+    name = fields.Char(string='Method of Transportation', required=True)
+    note = fields.Text(string='Note')
 
 
 class StockDdT(models.Model):
+
     _name = 'stock.ddt'
     _description = 'DdT'
 
@@ -48,11 +71,12 @@ class StockDdT(models.Model):
             [('code', '=', 'stock.ddt')]).id
 
     name = fields.Char(string='Number')
-    delivery_date = fields.Datetime(string='Date', required=True)
+    date = fields.Datetime(required=True, default=fields.Datetime.now())
+    delivery_date = fields.Datetime()
     sequence = fields.Many2one(
         'ir.sequence', string='Sequence',
         default=get_sequence, required=True)
-    pickings = fields.Many2many('stock.picking', string='Pickings')
+    picking_ids = fields.Many2many('stock.picking', string='Pickings')
     ddt_lines = fields.One2many(
         'stock.ddt.line', 'ddt_id', string='DdT Line')
     partner_id = fields.Many2one(
@@ -67,54 +91,62 @@ class StockDdT(models.Model):
     transportation_method_id = fields.Many2one(
         'stock.picking.transportation_method',
         'Method of Transportation')
+    parcels = fields.Integer()
     state = fields.Selection(
         [('draft', 'Draft'),
-            ('confirmed', 'Confirmed'),
-            ('cancelled', 'Cancelled')],
+         ('confirmed', 'Confirmed'),
+         ('cancelled', 'Cancelled')],
         string='State',
         default='draft'
         )
 
-    @api.model
-    def create(self, values):
-        sequence_model = self.env['ir.sequence']
-        sequence = sequence_model.browse(values['sequence'])
-        values['name'] = sequence_model.get(sequence.code)
-        return super(StockDdT, self).create(values)
-
     @api.multi
     def write(self, values):
         result = super(StockDdT, self).write(values)
-        if values.get('pickings'):
+        if values.get('picking_ids'):
             picking_model = self.env['stock.picking']
-            pickings = picking_model.browse(values['pickings'][0][2])
+            pickings = picking_model.browse(values['picking_ids'][0][2])
             pickings.write({'ddt_id': self.id})
         return result
+
+    # ----- Use this function to create line from external resource
+    def create_details(self, lines):
+        seq = 10
+        partner_id = False
+        for line in lines:
+            if not partner_id:
+                partner_id = line.picking_id.partner_id
+            # ----- Validate merge only for picking of the same partner
+            if line.picking_id.partner_id != partner_id:
+                raise Warning(
+                    _('Picking related partner must be the same (%s)'
+                        % line.picking_id.name))
+            ddt_line = self.ddt_lines.create(
+                {'sequence': seq,
+                 'ddt_id': self.id,
+                 'product_id': line.product_id.id,
+                 'name': line.name,
+                 'product_uom_id': line.product_uom.id,
+                 'quantity': line.product_uom_qty,
+                 })
+            line.write({'ddt_line_id': ddt_line.id})
+            seq += 10
 
     @api.one
     def updateLines(self):
         self.ddt_lines.unlink()
-        seq = 0
-        for picking in self.pickings:
-            if picking.partner_id != self.partner_id:
-                raise Warning(
-                    _('Picking related partner must be the same (%s)'
-                        % picking.name))
-            for move in picking.move_lines:
-                if not seq:
-                    seq = 10
-                else:
-                    seq += 10
-                self.ddt_lines.create(
-                    {
-                        'sequence': seq,
-                        'ddt_id': self.id,
-                        'picking': move.picking_id.id,
-                        'product': move.product_id.id,
-                        'name': move.name,
-                        'product_uom': move.product_uom.id,
-                        'quantity': move.product_uom_qty,
-                        })
+        move_lines = []
+        for picking in self.picking_ids:
+            move_lines.append(picking.move_lines)
+        self.create_details(move_lines)
+
+    @api.multi
+    def set_number(self):
+        for ddt in self:
+            if not ddt.name:
+                ddt.write({
+                    'name': ddt.sequence.get(ddt.sequence.code),
+                    })
 
     @api.multi
     def action_confirm(self):
@@ -125,39 +157,23 @@ class StockDdT(models.Model):
         self.write({'state': 'cancelled'})
 
 
-class StockPickingCarriageCondition(models.Model):
-    _name = "stock.picking.carriage_condition"
-    _description = "Carriage Condition"
+class StockDdTLine(models.Model):
 
-    name = fields.Char(string='Carriage Condition', required=True)
-    note = fields.Text(string='Note')
+    _name = 'stock.ddt.line'
+    _description = 'DdT Line'
 
+    sequence = fields.Integer(string='Sequence')
+    name = fields.Char(string='Name')
+    ddt_id = fields.Many2one('stock.ddt', string='DdT', ondelete='cascade')
+    product_id = fields.Many2one('product.product', string='Product')
+    quantity = fields.Float(string='Quantity')
+    product_uom_id = fields.Many2one('product.uom', string='UoM')
 
-class StockPickingGoodsDescription(models.Model):
-    _name = 'stock.picking.goods_description'
-    _description = "Description of Goods"
-
-    name = fields.Char(string='Description of Goods', required=True)
-    note = fields.Text(string='Note')
-
-
-class StockPickingTransportationReason(models.Model):
-    _name = 'stock.picking.transportation_reason'
-    _description = 'Reason for Transportation'
-
-    name = fields.Char(string='Reason For Transportation', required=True)
-    note = fields.Text(string='Note')
-
-
-class StockPickingTransportationMethod(models.Model):
-    _name = 'stock.picking.transportation_method'
-    _description = 'Method of Transportation'
-
-    name = fields.Char(string='Method of Transportation', required=True)
-    note = fields.Text(string='Note')
+    _order = 'sequence asc, id'
 
 
 class StockPicking(models.Model):
+
     _inherit = "stock.picking"
 
     carriage_condition_id = fields.Many2one(
@@ -170,6 +186,7 @@ class StockPicking(models.Model):
     transportation_method_id = fields.Many2one(
         'stock.picking.transportation_method',
         string='Method of Transportation')
+    parcels = fields.Integer()
     ddt_id = fields.Many2one('stock.ddt', string='DdT', readonly=True)
     ddt_type = fields.Selection(
         string="DdT Type", related='picking_type_id.code')
@@ -196,5 +213,13 @@ class StockPicking(models.Model):
                 'transportation_method_id':
                 picking.transportation_method_id and
                 picking.transportation_method_id.id,
+                'parcels': picking.parcels,
                 })
         return res
+
+
+class StockMove(models.Model):
+
+    _inherit = "stock.move"
+
+    ddt_line_id = fields.Many2one('stock.ddt.line', ondelete="set null")
