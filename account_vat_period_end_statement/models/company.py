@@ -22,10 +22,10 @@
 #
 ##############################################################################
 
-from openerp.osv import fields, orm
+from openerp import models, fields,
 
 
-class res_company(orm.Model):
+class res_company(models.Model):
     _inherit = 'res.company'
     _columns = {
         'quarterly_vat': fields.boolean(
