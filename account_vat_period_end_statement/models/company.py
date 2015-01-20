@@ -22,21 +22,20 @@
 #
 ##############################################################################
 
-from openerp import models, fields,
+from openerp import models, fields
 
 
 class res_company(models.Model):
     _inherit = 'res.company'
-    _columns = {
-        'quarterly_vat': fields.boolean(
-            'Quarterly vat',
+
+    quarterly_vat = fields.Boolean(
+            string='Quarterly vat',
             help="Check for quarterly vat period end statement, "
-            "also if monthly periods are set"),
-        'amount_interest': fields.float(
-            'Amount interest (%)',
+            "also if monthly periods are set")
+    amount_interest = fields.Float(
+            string = 'Amount interest (%)',
             help="Amount in percent of the interest concerning qaurterly"
-            "vat period end statement"),
-        }
+            "vat period end statement")
 
     _sql_constraints = [
         ('amount_interest_percent1', 'CHECK (amount_interest>=0)', 'Amount interest must >= 0!'),
