@@ -51,7 +51,7 @@ class SaleOrder(models.Model):
         string='Related DdTs',
         compute='_get_ddt_ids',
         )
-    create_ddt = fields.Boolean('Automatically create the DDT', default=True)
+    create_ddt = fields.Boolean('Automatically create the DDT')
 
     def onchange_partner_id(self, cr, uid, ids, partner_id, context=None):
         if not context:

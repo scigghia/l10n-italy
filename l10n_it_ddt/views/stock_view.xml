@@ -39,15 +39,7 @@
                         </group>
                         <notebook>
                             <page string="DDT Lines">
-                                <field name="ddt_lines">
-                                    <tree string="DDT Lines" editable="top">
-                                        <field name="sequence" widget="handle"/>
-                                        <field name="name"/>
-                                        <field name="product_id"/>
-                                        <field name="product_uom_id"/>
-                                        <field name="quantity"/>
-                                    </tree>
-                                </field>
+                                <field name="ddt_lines"/>
                             </page>
                             <page string="Pickings">
                                 <field name="picking_ids"

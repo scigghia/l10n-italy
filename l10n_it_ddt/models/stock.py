@@ -79,10 +79,11 @@ class StockDdT(models.Model):
     sequence = fields.Many2one(
         'ir.sequence', string='Sequence',
         default=get_sequence, required=True)
-    picking_ids = fields.Many2many(
-        'stock.picking', string='Pickings', readonly=True)
+    picking_ids = fields.One2many(
+        'stock.picking', 'ddt_id', string='Pickings', readonly=True)
     ddt_lines = fields.One2many(
-        'stock.ddt.line', 'ddt_id', string='DdT Line', readonly=True)
+        'stock.move', 'ddt_id', string='DdT Line', readonly=True,
+        compute='_get_lines')
     partner_id = fields.Many2one(
         'res.partner', string='Partner', required=True)
     delivery_address_id = fields.Many2one(
@@ -108,39 +109,10 @@ class StockDdT(models.Model):
         default='draft'
     )
 
-    def get_ddt_line_values(self, seq, move_line):
-        """ get DdT line values given `seq` number and a `move_line`
-        """
-        values = {
-            'sequence': seq,
-            'ddt_id': self.id,
-            'product_id': move_line.product_id.id,
-            'name': move_line.name,
-            'product_uom_id': move_line.product_uom.id,
-            'quantity': move_line.product_uom_qty,
-            'move_line_id': move_line.id
-        }
-        return values
-
-    @api.one
-    def create_lines(self, move_lines):
-        """ create DdT lines
-        """
-        seq = 10
-        partner_id = False
-        for move_line in move_lines:
-            if not partner_id:
-                partner_id = move_line.picking_id.partner_id
-            # ----- Validate merge only for picking of the same partner
-            if move_line.picking_id.partner_id != partner_id:
-                raise Warning(
-                    _('Picking related partner must be the same (%s)'
-                        % move_line.picking_id.name))
-            ddt_line = self.ddt_lines.create(
-                self.get_ddt_line_values(seq, move_line)
-            )
-            move_line.write({'ddt_line_id': ddt_line.id})
-            seq += 10
+    def _get_lines(self):
+        for ddt in self:
+            for picking in ddt.picking_ids:
+                ddt.ddt_lines |= picking.move_lines
 
     @api.multi
     def set_number(self):
@@ -173,22 +145,6 @@ class StockDdT(models.Model):
         return result
 
 
-class StockDdTLine(models.Model):
-
-    _name = 'stock.ddt.line'
-    _description = 'DdT Line'
-
-    sequence = fields.Integer(string='Sequence')
-    name = fields.Char(string='Name')
-    ddt_id = fields.Many2one('stock.ddt', string='DdT', ondelete='cascade')
-    product_id = fields.Many2one('product.product', string='Product')
-    quantity = fields.Float(string='Quantity')
-    product_uom_id = fields.Many2one('product.uom', string='UoM')
-    move_line_id = fields.Many2one('stock.move', ondelete="set null")
-
-    _order = 'sequence asc, id'
-
-
 class StockPicking(models.Model):
 
     _inherit = "stock.picking"
@@ -204,7 +160,7 @@ class StockPicking(models.Model):
         'stock.picking.transportation_method',
         string='Method of Transportation')
     parcels = fields.Integer()
-    ddt_id = fields.Many2one('stock.ddt', string='DdT', readonly=True)
+    ddt_id = fields.Many2one('stock.ddt', string='DdT')
     ddt_type = fields.Selection(
         string="DdT Type", related='picking_type_id.code')
 
@@ -239,7 +195,7 @@ class StockMove(models.Model):
 
     _inherit = "stock.move"
 
-    ddt_line_id = fields.Many2one('stock.ddt.line', ondelete="set null")
+    ddt_id = fields.Many2one('stock.ddt', ondelete="set null")
 
     @api.cr_uid_ids_context
     def _picking_assign(
