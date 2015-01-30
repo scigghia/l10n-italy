@@ -34,9 +34,8 @@ class SaleOrder(models.Model):
     def _get_ddt_ids(self):
         ddt_ids = []
         for picking in self.picking_ids:
-            for ddt in picking.ddt_ids:
-                if ddt.id not in ddt_ids:
-                    ddt_ids.append(ddt.id)
+            if picking.ddt_id.id not in ddt_ids:
+                ddt_ids.append(picking.ddt_id.id)
         self.ddt_ids = ddt_ids
 
     carriage_condition_id = fields.Many2one(
@@ -96,15 +95,13 @@ class SaleOrder(models.Model):
             if order.create_ddt:
                 ddt_data = {
                     'partner_id': order.partner_id.id,
-                    'picking_ids': [(6, 0, [p.id for p in order.picking_ids])],
                     }
                 ddt_pool = self.pool['stock.ddt']
                 ddt_id = ddt_pool.create(cr, uid, ddt_data, context=context)
-                move_lines = []
                 for picking in order.picking_ids:
-                    move_lines += picking.move_lines
-                ddt_pool.create_lines(
-                    cr, uid, [ddt_id], move_lines, context=context)
+                    self.pool.get('stock.picking').write(
+                        cr, uid, [picking.id], {'ddt_id': ddt_id.id})
+                    picking.ddt_id = ddt_id
                 workflow.trg_validate(
                     uid, 'stock.ddt', ddt_id, 'ddt_confirm', cr)
         return res
