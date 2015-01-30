@@ -78,15 +78,13 @@
                                 <thead>
                                     <tr>
                                         <th><strong>Description</strong></th>
-                                        <th><strong>Unit</strong></th>
                                         <th class="text-right"><strong>Quantity</strong></th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     <tr t-foreach="o.ddt_lines" t-as="line">
-                                        <td><span t-field="line.product_id"></span></td>
-                                        <td><span t-field="line.product_uom_id"></span></td>
-                                        <td class="text-right"><span t-field="line.quantity"></span></td>
+                                        <td><span t-field="line.name"></span></td>
+                                        <td class="text-right"><span t-field="line.product_uom_qty"></span></td>
                                     </tr>
                                 </tbody>
                             </table>
