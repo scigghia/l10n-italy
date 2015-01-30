@@ -91,7 +91,6 @@ class DdTCreateInvoice(models.TransientModel):
                         raise Warning(
                             _("Move %s is not invoiceable") % move.name)
                     todo.append(move)
-        import pdb; pdb.set_trace()
         invoices = picking_pool._invoice_create_line(
             self.env.cr, self.env.uid, todo, self.journal_id.id,
             inv_type='out_invoice', context=self.env.context)

@@ -47,7 +47,6 @@ class DdTFromPickings(models.TransientModel):
             'transportation_reason_id': False,
             'transportation_method_id': False
             }
-        import pdb; pdb.set_trace()
         partner = False
         for picking in self.picking_ids:
             if partner and partner != picking.partner_id:
