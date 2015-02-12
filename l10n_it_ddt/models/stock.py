@@ -203,4 +203,14 @@ class StockPicking(models.Model):
 class StockMove(models.Model):
     _inherit = "stock.move"
 
+    @api.multi
+    def _html_description(self):
+        for line in self:
+            line.description = ("%s %s %s" % (
+                line.header_note or '', line.name, line.footer_note or ''))
+
     ddt_id = fields.Many2one('stock.ddt', ondelete="set null")
+    header_note = fields.Text(string='Header Note')
+    footer_note = fields.Text(string='Footer Note')
+    description = fields.Text(
+        string='Description', compute='_html_description')

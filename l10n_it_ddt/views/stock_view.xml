@@ -2,6 +2,36 @@
 <openerp>
     <data>
 
+        <record id="view_ddt_line_html" model="ir.ui.view">
+            <field name="name">stock.move.tree.html</field>
+            <field name="model">stock.move</field>
+            <field name="arch" type="xml">
+                <tree colors="grey:scrapped == True" string="Stock Moves">
+                    <field name="description"/>
+                    <field name="product_uom_qty" on_change="onchange_quantity(product_id, product_uom_qty, product_uom, product_uos)"/>
+                    <field name="product_uom" string="Unit of Measure" groups="product.group_uom"/>
+                    <field name="product_uos_qty" groups="product.group_uos"/>
+                    <field name="product_uos" groups="product.group_uos"/>
+                    <field name="location_id" groups="stock.group_locations" invisible="1"/>
+                    <field name="picking_id" invisible="1" />
+                    <field name="create_date" invisible="1" />
+                    <field name="date_expected" invisible="1" />
+                    <button name="%(stock.move_scrap)d"
+                       string="Scrap Products" type="action"
+                       icon="terp-gtk-jump-to-ltr" context="{'scrap': True}"
+                       states="draft,waiting,confirmed,assigned"
+                       groups="stock.group_stock_user"/>
+                    <field name="scrapped" invisible="1"/>
+                    <field name="availability" invisible="1"/>
+                    <field name="reserved_availability" invisible="1"/>
+                    <field name="location_dest_id" groups="stock.group_locations"/>
+                    <field name="remaining_qty" invisible="1"/>
+                    <field name="string_availability_info"/>
+                    <field name="state"/>
+                </tree>
+            </field>
+        </record>
+
         <record id="stock_ddt_form" model="ir.ui.view">
             <field name="name">stock.ddt.form</field>
             <field name="model">stock.ddt</field>
@@ -39,7 +69,8 @@
                         </group>
                         <notebook>
                             <page string="DDT Lines">
-                                <field name="ddt_lines"/>
+                                <field name="ddt_lines"
+                                    context="{'tree_view_ref': 'l10n_it_ddt.view_ddt_line_html'}"/>
                             </page>
                             <page string="Pickings">
                                 <field name="picking_ids"
