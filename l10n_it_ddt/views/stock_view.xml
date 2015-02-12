@@ -2,6 +2,13 @@
 <openerp>
     <data>
 
+    <!-- Load css super mega wow! -->
+    <template id="assets_backend" name="stock_move assets" inherit_id="web.assets_backend">
+        <xpath expr="." position="inside">
+            <script type="text/javascript" src="/l10n_it_ddt/static/src/js/stock_move.js"></script>
+        </xpath>
+    </template>
+
         <record id="view_ddt_line_html" model="ir.ui.view">
             <field name="name">stock.move.tree.html</field>
             <field name="model">stock.move</field>

@@ -210,7 +210,7 @@ class StockMove(models.Model):
                 line.header_note or '', line.name, line.footer_note or ''))
 
     ddt_id = fields.Many2one('stock.ddt', ondelete="set null")
-    header_note = fields.Text(string='Header Note')
-    footer_note = fields.Text(string='Footer Note')
-    description = fields.Text(
+    header_note = fields.Html(string='Header Note')
+    footer_note = fields.Html(string='Footer Note')
+    description = fields.Html(
         string='Description', compute='_html_description')
