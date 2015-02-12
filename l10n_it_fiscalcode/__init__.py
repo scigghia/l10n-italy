@@ -1,4 +1,4 @@
-# -*- encoding: utf-8 -*-
+# -*- coding: utf-8 -*-
 ##############################################################################
 #
 #    Copyright (C) 2014 Associazione Odoo Italia
@@ -18,6 +18,14 @@
 #    along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #
 ##############################################################################
+"""
+from openerp import exceptions, _
 
+try:
+    import codicefiscaleaaa
+except ImportError:
+    raise exceptions.Warning(
+        _("codicefiscale not available, please install it!"))
+"""
 from . import model
 from . import wizard
