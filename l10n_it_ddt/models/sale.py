@@ -100,7 +100,7 @@ class SaleOrder(models.Model):
                 ddt_id = ddt_pool.create(cr, uid, ddt_data, context=context)
                 for picking in order.picking_ids:
                     self.pool.get('stock.picking').write(
-                        cr, uid, [picking.id], {'ddt_id': ddt_id.id})
+                        cr, uid, [picking.id], {'ddt_id': ddt_id})
                     picking.ddt_id = ddt_id
                 workflow.trg_validate(
                     uid, 'stock.ddt', ddt_id, 'ddt_confirm', cr)
