@@ -88,7 +88,7 @@ class account_invoice(osv.osv):
         }
 
     def action_cancel(self, cr, uid, ids, context=None):
-        if ids:
+        if len(ids) > 1:
             invoice = self.browse(cr, uid, ids)[0]
             # we get move_lines with date_maturity and check if they are
             # present in some riba_distinta_line
@@ -97,18 +97,17 @@ class account_invoice(osv.osv):
             move_line_ids = move_line_model.search(
                 cr, uid, [('move_id', '=', invoice.move_id.id),
                           ('date_maturity', '!=', False)])
-            if isinstance(move_line_ids, list):
-                move_line_ids = move_line_ids[0]
-            riba_line_ids = rdml_model.search(
-                cr, uid, [('move_line_id', '=', move_line_ids)])
-            if riba_line_ids:
-                if isinstance(riba_line_ids, list):
-                    riba_line_ids = riba_line_ids[0]
-                distinta = rdml_model.browse(cr, uid, riba_line_ids)
-                raise osv.except_osv(
-                    'Attenzione!',
-                    'La fattura è collegata alla Distinta RI.BA. nr {}'.format(
-                        distinta.riba_line_id.distinta_id.name
-                    ) )
+            if move_line_ids:
+                riba_line_ids = rdml_model.search(
+                    cr, uid, [('move_line_id', '=', move_line_ids)])
+                if riba_line_ids:
+                    if isinstance(riba_line_ids, list):
+                        riba_line_ids = riba_line_ids[0]
+                    distinta = rdml_model.browse(cr, uid, riba_line_ids)
+                    raise osv.except_osv(
+                        _('Attention!'),
+                        _('Invoice is linked to RI.BA. list nr {}').format(
+                            distinta.riba_line_id.distinta_id.name
+                        ) )
         res = super(account_invoice, self).action_cancel(cr, uid, ids, context)
         return res
