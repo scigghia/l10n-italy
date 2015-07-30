@@ -25,6 +25,7 @@
 ##############################################################################
 
 from osv import fields, osv
+from tools.translate import _
 
 
 class account_payment_term(osv.osv):
