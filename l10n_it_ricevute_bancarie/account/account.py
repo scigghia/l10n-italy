@@ -88,7 +88,7 @@ class account_invoice(osv.osv):
         }
 
     def action_cancel(self, cr, uid, ids, context=None):
-        if len(ids) > 1:
+        if len(ids) > 0:
             invoice = self.browse(cr, uid, ids)[0]
             # we get move_lines with date_maturity and check if they are
             # present in some riba_distinta_line
