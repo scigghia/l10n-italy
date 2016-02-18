@@ -154,6 +154,11 @@ msgid "Descrizione"
 msgstr "Descrizione"
 
 #. module: l10n_it_ricevute_bancarie
+#: help:riba.distinta,bank_number:0
+msgid "Bank number for this issue"
+msgstr "Numero distinta rilasciato dalla banca"
+
+#. module: l10n_it_ricevute_bancarie
 #: view:account.move.line:0
 msgid "Total Debit"
 msgstr "Debito totale"
@@ -484,6 +489,11 @@ msgstr "Emissione Ricevute Bancarie"
 #: selection:riba.distinta.line,state:0
 msgid "Draft"
 msgstr "Bozza"
+
+#. module: l10n_it_ricevute_bancarie
+#: field:riba.distinta,bank_number:0
+msgid "Bank number"
+msgstr "Numero distinta banca"
 
 #. module: l10n_it_ricevute_bancarie
 #: field:riba.file.export,state:0
