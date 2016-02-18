@@ -68,7 +68,10 @@ class riba_distinta(osv.osv):
 
     _columns = {
         'name': fields.char('Reference', size=128, required=True, readonly=True, states={'draft': [('readonly', False)]}),
-        'config': fields.many2one('riba.configurazione', 'Configuration', 
+        'bank_number': fields.char(
+            'Bank number', size=128, readonly=True, states={'draft': [('readonly', False)]},
+            help="Bank number for this issue"),
+        'config': fields.many2one('riba.configurazione', 'Configuration',
             select=True, required=True, readonly=True, states={'draft': [('readonly', False)]}, 
             help='Riba configuration to be used'),
         'state': fields.selection([

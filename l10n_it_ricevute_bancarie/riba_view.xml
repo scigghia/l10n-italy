@@ -18,6 +18,7 @@
                     <filter icon="terp-dolar_ok!" string="Paid" domain="[('state','=','paid')]" help="Paid"/>
                     <separator orientation="vertical"/>
                     <field name="name" />
+                    <field name="bank_number" />
                     <field name="config" />
                     <field name="date_accepted" />
                     <field name="date_paid" />
@@ -35,6 +36,7 @@
             <field name="arch" type="xml">
                 <tree string="Distinte Ri.Ba.">
                     <field name="name" />
+                    <field name="bank_number" />
                     <field name="config" />
                     <field name="date_accepted" />
                     <field name="date_paid" />
@@ -52,8 +54,11 @@
             <field name="type">form</field>
             <field name="arch" type="xml">
                 <form string="Ri.Ba. - Distinta">
-                    <field name="name" />
-                    <field name="config" widget="selection"/>
+                    <group col="6">
+                        <field name="name" />
+                        <field name="bank_number" />
+                        <field name="config" widget="selection"/>
+                    </group>
                     <notebook colspan="4">
                         <page string="General">
                             <field name="line_ids" nolabel="1" colspan="4">
