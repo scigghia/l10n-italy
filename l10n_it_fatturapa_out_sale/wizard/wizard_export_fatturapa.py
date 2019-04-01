@@ -18,6 +18,7 @@ class WizardExportFatturapa(models.TransientModel):
                 # check if already present ref for this invoice
                 existing_rel_docs = rel_docs_model.search([
                     ('invoice_id', '=', invoice.id),
+                    ('type', '=', 'order')
                 ])
                 if existing_rel_docs:
                     existing_rel_docs.unlink()
