@@ -99,15 +99,33 @@ class AccountMoveLine(models.Model):
                         riba_line.state = 'paid'
                         riba_line.distinta_id.state = 'paid'
 
-    def reconcile(
-        self, writeoff_acc_id=False, writeoff_journal_id=False
-    ):
-        res = super(AccountMoveLine, self).reconcile(
-            writeoff_acc_id=writeoff_acc_id,
-            writeoff_journal_id=writeoff_journal_id)
+    def reconcile(self):
+        res = super(AccountMoveLine, self).reconcile()
         for line in self:
             line.update_paid_riba_lines()
         return res
+
+    def action_riba_issue(self):
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Issue C/O",
+            "res_model": "riba.issue",
+            "view_mode": "form",
+            "view_type": "form",
+            "target": "new",
+            'context': self.env.context
+        }
+        
+        
+        
+        action = self.env['ir.actions.act_window']._for_xml_id('l10n_it_ricevute_bancarie.riba_issue_action')
+        # Force the values of the move line in the context to avoid issues
+        ctx = dict(self.env.context)
+        ctx.pop('active_id', None)
+        ctx['active_ids'] = self.ids
+        ctx['active_model'] = 'account.move.line'
+        action['context'] = ctx
+        return action
 
 
 class AccountInvoice(models.Model):
@@ -152,7 +170,7 @@ class AccountInvoice(models.Model):
             # ---- Add a line with collection fees for each due date only for first due
             # ---- date of the month
             if (
-                invoice.type != 'out_invoice' or not
+                invoice.move_type != 'out_invoice' or not
                 invoice.invoice_payment_term_id or not
                 invoice.invoice_payment_term_id.riba or
                 invoice.invoice_payment_term_id.riba_payment_cost == 0.0

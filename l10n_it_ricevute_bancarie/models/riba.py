@@ -180,23 +180,23 @@ class RibaListLine(models.Model):
                 line.amount += move_line.amount
                 if not line.invoice_date:
                     line.invoice_date = str(fields.Date.from_string(
-                        move_line.move_line_id.move_id.date_invoice
+                        move_line.move_line_id.move_id.invoice_date
                     ).strftime('%d/%m/%Y'))
                 else:
                     line.invoice_date = "%s, %s" % (
                         line.invoice_date, str(fields.Date.from_string(
-                            move_line.move_line_id.move_id.date_invoice
+                            move_line.move_line_id.move_id.invoice_date
                         ).strftime('%d/%m/%Y')))
                 if not line.invoice_number:
                     line.invoice_number = str(
                         move_line.move_line_id.move_id.move_id.name if
-                        move_line.move_line_id.move_id.move_name == '/' else
-                        move_line.move_line_id.move_id.move_name)
+                        move_line.move_line_id.move_id.display_name == '/' else
+                        move_line.move_line_id.move_id.display_name)
                 else:
                     line.invoice_number = "%s, %s" % (line.invoice_number, str(
                         move_line.move_line_id.move_id.move_id.name if
-                        move_line.move_line_id.move_id.move_name == '/' else
-                        move_line.move_line_id.move_id.move_name))
+                        move_line.move_line_id.move_id.display_name == '/' else
+                        move_line.move_line_id.move_id.display_name))
 
     amount = fields.Float(
         compute='_compute_line_values', string="Amount")
@@ -306,15 +306,12 @@ class RibaListLine(models.Model):
             riba_move_line_name = ''
             for riba_move_line in line.move_line_ids:
                 total_credit += riba_move_line.amount
-                if riba_move_line.move_line_id.move_id.number and \
-                        riba_move_line.move_line_id.move_id.number \
-                        not in riba_move_line_name:
+                if str(riba_move_line.move_line_id.move_id.sequence_number) and str(riba_move_line.move_line_id.move_id.sequence_number) not in riba_move_line_name:
                     riba_move_line_name = ' '.join([
                         riba_move_line_name,
-                        riba_move_line.move_line_id.move_id.number
+                        str(riba_move_line.move_line_id.move_id.sequence_number)
                     ]).lstrip()
-                elif riba_move_line.move_line_id.name and \
-                        riba_move_line.move_line_id.name not in riba_move_line_name:
+                elif riba_move_line.move_line_id.name and riba_move_line.move_line_id.name not in riba_move_line_name:
                     riba_move_line_name = ' '.join([
                         riba_move_line_name, riba_move_line.move_line_id.name
                     ]).lstrip()
@@ -324,7 +321,7 @@ class RibaListLine(models.Model):
                     {
                         'name': (
                             riba_move_line.move_line_id.move_id and
-                            riba_move_line.move_line_id.move_id.number or
+                            riba_move_line.move_line_id.move_id.sequence_number or
                             riba_move_line.move_line_id.name),
                         'partner_id': line.partner_id.id,
                         'account_id': (

@@ -6,6 +6,7 @@
 # Copyright (C) 2012-2017 Lorenzo Battistini - Agile Business Group
 # Copyright (C) 2019 Sergio Zanchetta - Associazione PNLUG
 # Copyright (C) 2020 Matteo Boscolo - OmniaSolutions
+# Copyright (C)  2021 Daniel Smerghetto (Omniasolutions snc) www.omniasolutions.eu
 # License AGPL-3.0 or later (http://www.gnu.org/licenses/agpl).
 
 {

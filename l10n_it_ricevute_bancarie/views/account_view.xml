@@ -152,10 +152,10 @@
     <record id="action_invoice_tree1" model="ir.actions.act_window">
         <field name="name">Past Due Invoices</field>
         <field name="res_model">account.move</field>
-        <field name="view_mode">tree,form,calendar,graph</field>
+        <field name="view_mode">tree,form,graph</field>
         <field eval="False" name="view_id"/>
-        <field name="domain">[('type','=','out_invoice'), ('unsolved_move_line_ids', '!=', False)]</field>
-        <field name="context">{'default_type':'out_invoice', 'type':'out_invoice', 'journal_type': 'sale', 'search_default_unsolved': True}</field>
+        <field name="domain">[('move_type','=','out_invoice'), ('unsolved_move_line_ids', '!=', False)]</field>
+        <field name="context">{'default_type':'out_invoice', 'move_type':'out_invoice', 'journal_type': 'sale', 'search_default_unsolved': True}</field>
         <field name="search_view_id" ref="account.view_account_invoice_filter"/>
     </record>
 
@@ -169,7 +169,7 @@
     <record id="action_invoice_tree1_view2" model="ir.actions.act_window.view">
         <field eval="2" name="sequence"/>
         <field name="view_mode">form</field>
-        <field name="view_id" ref="account.invoice_form"/>
+        <field name="view_id" ref="account.view_move_form"/>
         <field name="act_window_id" ref="action_invoice_tree1"/>
     </record>
     <menuitem name="Past Due Invoices" parent="menu_riba"

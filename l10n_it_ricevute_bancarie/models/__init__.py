@@ -10,4 +10,5 @@ from . import riba_config
 from . import partner
 from . import riba
 from . import account
+from . import bank_statement
 from . import account_config

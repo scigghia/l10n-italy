@@ -16,7 +16,7 @@ class RibaConfiguration(models.Model):
 
     name = fields.Char("Description", size=64, required=True)
     type = fields.Selection(
-        (('sbf', 'Subject To Collection'), ('incasso', 'After Collection')),
+        [('sbf', 'Subject To Collection'), ('incasso', 'After Collection')],
         "Issue Mode", required=True)
     bank_id = fields.Many2one(
         'res.partner.bank', "Bank Account", required=True,

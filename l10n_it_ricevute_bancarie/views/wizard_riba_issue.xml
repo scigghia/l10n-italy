@@ -25,13 +25,14 @@
     <!-- ====================================================== -->
     <!--                     ACTION EMISSIONE RIBA                -->
     <!-- ====================================================== -->
-    <record id="riba_issue_action" model="ir.actions.act_window">
-        <field name="name">Issue C/O</field>
-        <field name="type">ir.actions.act_window</field>
-        <field name="res_model">riba.issue</field>
-        <field name="binding_model_id" ref="account.model_account_move_line"/>
-        <field name="target">new</field>
-        <field name="view_id" ref="riba_issue_view"/>
-    </record>
+
+
+        <record id="riba_issue_action_server" model="ir.actions.server">
+            <field name="name">Issue C/O</field>
+            <field name="model_id" ref="account.model_account_move_line"/>
+            <field name="binding_model_id" ref="account.model_account_move_line"/>
+            <field name="state">code</field>
+            <field name="code">action = records.action_riba_issue()</field>
+        </record>
 
 </odoo>

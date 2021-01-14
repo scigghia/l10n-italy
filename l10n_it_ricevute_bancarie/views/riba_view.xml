@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <odoo>
 
-    <menuitem name="C/O" parent="account.menu_finance" id="menu_riba" />
+    <menuitem name="C/O" parent="account_accountant.menu_accounting" id="menu_riba" />
 
     <!-- ====================================================== -->
     <!--                     DISTINTA RIBA - FILTRI             -->
@@ -120,7 +120,7 @@
                     <button name="confirm" type='object' string="Mark as Accepted" class="oe_highlight" attrs="{'invisible':['|',('state','!=','draft'),('type','=','incasso')]}"/>
                     <button name="%(riba_accreditation_action)d" type='action' attrs="{'invisible':['|',('state','!=','accepted'),('type','=','incasso')]}" string="Mark as Credited" class="oe_highlight"/>
                     <button name="riba_cancel" type='object' attrs="{'invisible':[('state','=','cancel')]}" string="Cancel" />
-                    <button name="settle_all_line" type='object' string="Mark All as Settled" class="oe_highlight" attrs="{'invisible':['|',('state','!=','accredited')]}"/>
+                    <button name="settle_all_line" type='object' string="Mark All as Settled" class="oe_highlight" attrs="{'invisible':[('state','!=','accredited')]}"/>
                     <button name="action_cancel_draft" attrs="{'invisible':['|',('state','!=','cancel'),('type','=','incasso')]}"  string="Reset to Draft" type="object" />
                     <field name="state"     widget="statusbar" />
                 </header>
