@@ -188,7 +188,7 @@ class AccountAbstractPayment(models.Model):
         if self.env.context.get('active_model','') == 'account.move':
             move_id = self.env.context.get('active_id')
             obj_invoice = self.env['account.move']
-            invoice_id_object = obj_invoice.browse(move_id)
+            invoice_id_object = obj_invoice.search([('id', '=', move_id)])
             if invoice_id_object.withholding_tax_amount and invoice_id_object.withholding_tax_amount:
                 coeff_net = invoice_id_object.residual / invoice_id_object.amount_total
                 rec['amount'] = invoice_id_object.amount_net_pay_residual * coeff_net
