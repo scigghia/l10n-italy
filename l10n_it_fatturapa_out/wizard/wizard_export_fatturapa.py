@@ -102,8 +102,8 @@ class WizardExportFatturapa(models.TransientModel):
                 .with_context(context_partner)
                 .browse(invoice_ids)
             )
-            for invoice in invoice_ids:
-                invoice.set_taxes_for_descriptive_lines()
+#             for invoice in invoice_ids:
+#                 invoice.set_taxes_for_descriptive_lines()
 
             fatturapa = EFatturaOut(
                 self.env.company, partner, invoice_ids, progressivo_invio
