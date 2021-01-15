@@ -49,7 +49,7 @@ class AccountPartialReconcile(models.Model):
             ml_ids.append(vals.get("debit_move_id"))
         if vals.get("credit_move_id"):
             ml_ids.append(vals.get("credit_move_id"))
-        move_lines = self.env["account.move.line"].browse(ml_ids)
+        move_lines = self.env["account.move.line"].search([('id', 'in', ml_ids)])
         for ml in move_lines:
             domain = [("move_id", "=", ml.move_id.id)]
             invoice = self.env["account.move"].search(domain)
@@ -351,10 +351,7 @@ class AccountMove(models.Model):
 
     @api.model
     def create(self, vals):
-        invoice = super(AccountMove, self.with_context(mail_create_nolog=True)).create(
-            vals
-        )
-
+        invoice = super(AccountMove, self.with_context(mail_create_nolog=True)).create(vals)
         if (
             any(line.invoice_line_tax_wt_ids for line in invoice.invoice_line_ids)
             and not invoice.withholding_tax_line_ids
