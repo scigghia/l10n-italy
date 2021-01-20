@@ -19,13 +19,15 @@
             </form>
         </field>
     </record>
-
-     <record id="action_wizard_riba_file_export" model="ir.actions.act_window">
-         <field name="name">Export C/O</field>
-         <field name="res_model">riba.file.export</field>
-         <field name="view_mode">tree,form</field>
-         <field name="view_id" ref="wizard_riba_file_export"/>
-         <field name="target">new</field>
-     </record>
+    
+    
+    
+    <record id="action_wizard_riba_file_export" model="ir.actions.server">
+        <field name="name">Export C/O</field>
+        <field name="model_id" ref="l10n_it_ricevute_bancarie.model_riba_distinta"/>
+        <field name="binding_model_id" ref="l10n_it_ricevute_bancarie.model_riba_distinta"/>
+        <field name="state">code</field>
+        <field name="code">action = records.action_riba_export()</field>
+    </record>
 
 </odoo>
