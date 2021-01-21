@@ -15,3 +15,4 @@ access_riba_configuration_manager,riba_configuration,model_riba_configuration,ac
 access_riba_configuration_invoice,riba_configuration invoice,model_riba_configuration,account.group_account_invoice,1,0,0,0
 access_riba_issue,riba_issue,model_riba_issue,account.group_account_invoice,1,1,1,1
 access_riba_accreditation,riba_accreditation,model_riba_accreditation,account.group_account_invoice,1,1,1,1
+access_riba_file_export,riba_file_export,model_riba_file_export,account.group_account_invoice,1,1,1,1

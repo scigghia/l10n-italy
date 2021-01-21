@@ -49,9 +49,9 @@ class AccountPartialReconcile(models.Model):
             ml_ids.append(vals.get("debit_move_id"))
         if vals.get("credit_move_id"):
             ml_ids.append(vals.get("credit_move_id"))
-        move_lines = self.env["account.move.line"].browse(ml_ids)
+        move_lines = self.env["account.move.line"].search([('id', 'in', ml_ids)])
         for ml in move_lines:
-            domain = [("move_id", "=", ml.move_id.id)]
+            domain = [("id", "=", ml.move_id.id)]
             invoice = self.env["account.move"].search(domain)
             if invoice:
                 break
@@ -185,17 +185,13 @@ class AccountAbstractPayment(models.Model):
         Compute amount to pay proportionally to amount total - wt
         """
         rec = super(AccountAbstractPayment, self).default_get(fields)
-        invoice_defaults = self.resolve_2many_commands(
-            "invoice_ids", rec.get("invoice_ids")
-        )
-        if invoice_defaults and len(invoice_defaults) == 1:
-            invoice = invoice_defaults[0]
-            if (
-                "withholding_tax_amount" in invoice
-                and invoice["withholding_tax_amount"]
-            ):
-                coeff_net = invoice["amount_residual"] / invoice["amount_total"]
-                rec["amount"] = invoice["amount_net_pay_residual"] * coeff_net
+        if self.env.context.get('active_model','') == 'account.move':
+            move_id = self.env.context.get('active_id')
+            obj_invoice = self.env['account.move']
+            invoice_id_object = obj_invoice.search([('id', '=', move_id)])
+            if invoice_id_object.withholding_tax_amount and invoice_id_object.withholding_tax_amount:
+                coeff_net = invoice_id_object.residual / invoice_id_object.amount_total
+                rec['amount'] = invoice_id_object.amount_net_pay_residual * coeff_net
         return rec
 
     def _compute_payment_amount(self, invoices=None, currency=None):
@@ -355,10 +351,7 @@ class AccountMove(models.Model):
 
     @api.model
     def create(self, vals):
-        invoice = super(AccountMove, self.with_context(mail_create_nolog=True)).create(
-            vals
-        )
-
+        invoice = super(AccountMove, self.with_context(mail_create_nolog=True)).create(vals)
         if (
             any(line.invoice_line_tax_wt_ids for line in invoice.invoice_line_ids)
             and not invoice.withholding_tax_line_ids

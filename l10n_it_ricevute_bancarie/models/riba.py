@@ -99,6 +99,17 @@ class RibaList(models.Model):
         default=lambda self: fields.Date.context_today(self),
         help="Keep empty to use the current date.")
 
+    def action_riba_export(self):
+        return {
+            "type": "ir.actions.act_window",
+            "name": "Issue C/O",
+            "res_model": "riba.file.export",
+            "view_mode": "form",
+            "view_type": "form",
+            "target": "new",
+            'context': self.env.context
+        }
+        
     def unlink(self):
         for riba_list in self:
             if riba_list.state not in ('draft',  'cancel'):
