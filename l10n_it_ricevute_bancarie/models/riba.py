@@ -428,12 +428,13 @@ class RibaListLine(models.Model):
                 }
             )
 
+            move_line_credit.move_id.action_post()
             to_be_settled = self.env['account.move.line']
             to_be_settled |= move_line_credit
             to_be_settled |= settlement_move_line
 
             to_be_settled.reconcile()
-            settlement_move.post()
+            settlement_move.action_post()
 
 
 class RibaListMoveLine(models.Model):
